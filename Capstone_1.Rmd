@@ -1,0 +1,248 @@
+---
+title: "Capstone_20240128 (EXPLORING the PTC data for 1st time)"
+output: html_document
+date: "2024-01-28"
+---
+
+# OBJECTIVE: 
+1. Preparing data about attendance
+2. Trying to get the Non-particpant data from the existed data
+3. Making a plot of number of each category
+4. Counting how many current member from the existed data
+5. Ploting the counts of members in each member type
+6. Preparing the questions to ask during next week meeting
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readxl)
+library(dplyr)
+library(ggplot2)
+```
+
+# Some brainstorm
+# How is the variable of event participation linked to member renewal? #
+#### For Attendee data ####
+```{r}
+# please change "heiyo" to your laptop name
+# Load the Excel file: Event Attendees 2018 through 2023.xlsx
+att_data <- "/Users/heiyo/Desktop/MQE/Capstone/Event Attendees 2018 through 2023.xlsx"
+sheet <- excel_sheets(att_data)
+att_2018data <- read_excel(att_data, sheet = sheet[1])
+att_2019data <- read_excel(att_data, sheet = sheet[2])
+att_2020data <- read_excel(att_data, sheet = sheet[3])
+att_2021data <- read_excel(att_data, sheet = sheet[4])
+att_2022data <- read_excel(att_data, sheet = sheet[5])
+att_2023data <- read_excel(att_data, sheet = sheet[6])
+```
+
+```{r}
+cleaned_18att <- att_2018data %>%
+  select(-`First Name`, -`Last Name`,  -`Title`, -`Registrant Email`)
+cleaned_19att <- att_2019data %>%
+  select(-`First Name`, -`Last Name`,  -`Title`, -`Registrant Email`)
+cleaned_20att <- att_2020data %>%
+  select(-`First Name`, -`Last Name`,  -`Title`, -`Registrant Email`)
+cleaned_21att <- att_2021data %>%
+  select(-`First Name`, -`Last Name`,  -`Title`, -`Registrant Email`)
+cleaned_22att <- att_2022data %>%
+  select(-`First Name`, -`Last Name`,  -`Title`, -`Registrant Email`)
+cleaned_23att <- att_2023data %>%
+  select(-`First Name`, -`Last Name`,  -`Title`, -`Registrant Email`)
+```
+
+```{r}
+#length(unique(cleaned_18att$`Event Code`))
+#length(unique(cleaned_19att$`Event Code`))
+#length(unique(cleaned_20att$`Event Code`))
+#length(unique(cleaned_21att$`Event Code`))
+#length(unique(cleaned_22att$`Event Code`))
+#length(unique(cleaned_23att$`Event Code`))
+# 75
+# 61
+# 57
+# 39
+# 43
+# 11
+```
+
+#### For 2023 Attendee data ####
+```{r}
+#create a new col name 'Attendee' and set all values be 1
+cleaned_23att$Attendee <- 1
+```
+
+```{r}
+new_cleaned_23att <- cleaned_23att %>%
+  select(-`Register Type`)
+new_cleaned_23att <- new_cleaned_23att %>%
+  filter(`Company Member Type` %in% c("M", "MN"))
+# non-particpant is for the member and new member.
+```
+
+```{r}
+unique_combinations <- unique(cleaned_23att[, c("Company", "Event Code")])
+print(unique_combinations)
+```
+
+```{r}
+new_cleaned_23att <- new_cleaned_23att %>%
+  group_by('Company','Event Code')%>%
+  summarise(`Company Member Type` = first(`Company Member Type`),
+            `Paid Through Date` = first(`Paid Through`),
+            `Join Date` = first(`Join Date`), .groups = 'drop') %>%
+  ungroup()
+```
+
+```{r}
+unique_register_types <- unique(cleaned_23att$'Register Type')
+print(unique_register_types)
+```
+
+#### For Non-Participant data ####
+```{r}
+# Load the Excel file: NonParticipant.Members.LastYear.xlsx
+Nonpartipant_data <-read_excel("/Users/heiyo/Desktop/MQE/Capstone/NonParticipant.Members.LastYear.xlsx") 
+```
+
+```{r}
+# remove erased data
+Nonpartipant_data <- Nonpartipant_data %>% filter(Company != '(Erased)')
+```
+
+```{r}
+# already only for member an member new.
+Nonpartipant_data <- Nonpartipant_data %>% filter(`Member Type` %in% c("M", "MN"))
+# 347 observations
+```
+
+```{r}
+unique_category_types <- unique(Nonpartipant_data$'Category')
+print(unique_category_types)
+# "Tech" "Ent"  "NP"   "TU"   "Edu"  NA
+```
+
+```{r}
+category_counts <- table(Nonpartipant_data$'Category')
+```
+
+```{r}
+category_data <- data.frame(Category = names(category_counts),
+                            Count = category_counts)
+```
+
+```{r}
+# rename, for the plot
+category_data <- category_data %>%
+  mutate(Category = ifelse(Category == "Edu", "Education",
+                           ifelse(Category == "NP", "Non-Profit", 
+                                  ifelse(Category == "Ent", "Entrepreneur",
+                                         ifelse(Category == "Tech","Technology",
+                                                ifelse(Category == "TU","Technology User", Category))))))
+```
+
+```{r}
+nonpart_plot <- ggplot(category_data, aes(x = Category, y = Count.Freq)) +
+  geom_bar(stat = "identity", fill = "lightgreen") +
+  geom_text(aes(label = Count.Freq), vjust = -0.5, size = 4, fontface = "bold") +
+  labs(title = "Count of Nonparticipants in Each Category",
+       x = "Category",
+       y = "Count") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.6, size = 9),
+        axis.title = element_text(size = 12, face = "bold"))+
+  ylim(0, max(category_counts) * 1.2)
+nonpart_plot
+```
+
+
+#### For Current Member data ####
+```{r}
+# Load the Excel file: Current.Members.JoinDate.xlsx
+CurrentMember_data <-read_excel("/Users/heiyo/Desktop/MQE/Capstone/Current.Members.JoinDate.xlsx") 
+```
+
+```{r}
+# Check how many current member:
+num_cu_member <- nrow(CurrentMember_data)
+num_cu_member
+# 835
+```
+
+```{r}
+# Check how many member type
+unique_member_types <- unique(CurrentMember_data$'Member Type')
+print(unique_member_types)
+# "Non-Profit"      "Technology"      "Entrepreneur"    "Education"       "Technology User"
+```
+
+```{r}
+# Check how many company are in each member type?
+member_type_counts <- table(CurrentMember_data$'Member Type')
+#print(member_type_counts)
+# Education 46    Entrepreneur 156    Non-Profit 60     Technology 396  Technology User 177
+```
+
+```{r}
+member_count_data <- data.frame(Category = names(member_type_counts),
+                                Count = as.numeric(member_type_counts))
+```
+
+# Plot the counts of members in each member type
+```{r}
+member_count_plot <- ggplot(member_count_data, aes(x = Category, y = Count)) +
+  geom_bar(stat = "identity", fill = "lightgreen") +
+  geom_text(aes(label = Count), vjust = -0.5, size = 4, fontface = "bold") +
+  labs(title = "Count of Members in Each Category",
+       x = "Category",
+       y = "Count") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.6, size = 9),
+        axis.title = element_text(size = 12, face = "bold")) +
+  ylim(0, max(member_count_data$Count) * 1.2) 
+member_count_plot
+```
+
+#### Merge data ####
+```{r}
+#merged_data <- merge(CurrentMember_data, cleaned_23att, by = "Company", all.x = TRUE)
+# Current member 835
+# ........
+```
+
+```{r}
+#merged_data$Attendee <- ifelse(is.na(merged_data$Attendee), 0, merged_data$Attendee)
+```
+
+
+#### How is the variable of event participation linked to member renewal? 
+1. event participation (attendee/brite) 
+2. member renewal (monthly member list )
+3. non-participant
+4. benefit use
+5. job posted
+6. scorecard usage
+
+Questions (be ready to ask at meeting with PTC):
+## ideally, event participation, which a binary variable indicating whether a member attended an event (1 for attended, 0 for did not attend), and member renewal, also a binary variable indicating whether a member renewed their membership (1 for renewed, 0 for not renewed).
+
+#### What type of engagement levers are helpful in securing renewal? 
+- type of engagement levers:
+- attending events(attendees) 
+- usage of career services? (Job's Posted on Career Connector by Company (only member can post or not?))
+
+#### Regarding the 'Job's Posted on Career Connector by Company
+Questions:
+- there are some blank in this dataset, meaning?
+- Start from 2021 to current, if only member can post on Career Connector, -> any relation b/w renewing membership?
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,140 @@
+---
+title: "Capstone_20240207 (EXPLORING Scorecard dataset)"
+output: html_document
+date: "2024-02-07"
+---
+
+# OBJECTIVE:
+1. Preparing the scorecard data
+2. Graph: "Scorecards from 2018-2023 for all Members"
+3. Graph: "Category of Engagement SC"
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readxl)
+library(tidyr)
+library(tidyverse)
+library(ggplot2)
+```
+
+```{r}
+# please change "heiyo" to your laptop name
+# Load the Excel file: Name: Scorecards 2018 through 2023.xlsx
+
+sc_data <- "/Users/heiyo/Desktop/MQE/Capstone/Scorecards 2018 through 2023.xlsx"
+sheet <- excel_sheets(sc_data)
+sc_2018data <- read_excel(sc_data, sheet = sheet[1])
+sc_2019data <- read_excel(sc_data, sheet = sheet[2])
+sc_2020data <- read_excel(sc_data, sheet = sheet[3])
+sc_2021data <- read_excel(sc_data, sheet = sheet[4])
+sc_2022data <- read_excel(sc_data, sheet = sheet[5])
+sc_2023data <- read_excel(sc_data, sheet = sheet[6])
+sc_alldata <- bind_rows(sc_2018data, sc_2019data, sc_2020data, sc_2021data,
+sc_2022data, sc_2023data)
+```
+
+```{r}
+no_rows <- grepl("No:", sc_alldata$`SC Type`)
+```
+
+```{r}
+sc_alldata$`SC Type`[no_rows] <- gsub("^No: ", "", sc_alldata$'SC Type'[no_rows])
+```
+
+```{r}
+sc_type2018 <- unique(sc_2018data$`SC Type`)
+sc_type2019 <- unique(sc_2019data$`SC Type`)
+sc_type2020 <- unique(sc_2020data$`SC Type`)
+sc_type2021 <- unique(sc_2021data$`SC Type`)
+sc_type2022 <- unique(sc_2022data$`SC Type`)
+sc_type2023 <- unique(sc_2023data$`SC Type`)
+```
+
+```{r}
+# Separate the values in "SC Type" column into "type" and "reasoning"
+sc_alldata <- separate(sc_alldata, `SC Type`, into = c("type",
+"reasoning"), sep = ":", remove = FALSE)
+# Check for unique values present in the new "type" column
+unique(sc_alldata$type)
+```
+
+```{r}
+sc_alldata <- sc_alldata %>%
+  mutate(type = ifelse(str_detect(reasoning, "Outreach"), "Outreach", type))
+```
+
+```{r}
+# Graph for all types of Scorecards in 2018-2023 for M or MN
+sc_alldata_mems <- sc_alldata %>% 
+  filter(`Member Type` %in% c("M", "MN")) %>%
+  unique()
+```
+
+```{r}
+# Categorizing relevant SC Types into main categories
+# Below converts Fortyx80 values into talent
+sc_alldata_mems <- sc_alldata_mems %>% mutate(type = ifelse(type %in% c("Fortyx80", "FortyX80"), "Talent", type))
+
+# Below removes all "Past Due" values
+sc_alldata_mems <- sc_alldata_mems %>% filter(type != "Past Due")
+
+# Below removes the 1 "referral" observation
+sc_alldata_mems <- sc_alldata_mems %>% filter(type != "Referral")
+sc_alldata_mems <- sc_alldata_mems %>% filter(type != "Referral")
+```
+
+```{r}
+sc_alldata_mems <- sc_alldata_mems %>% filter(type != "Sales")
+```
+
+
+```{r}
+plot_allmems <- ggplot(sc_alldata_mems, aes(x = type)) +
+  geom_bar(stat = "count", fill = "lightgreen") + 
+  geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.25) + 
+  labs(title = "Scorecards from 2018-2023 for all Members", x = "SC type", y = "# of Scorecards") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+plot_allmems + coord_cartesian(ylim = c(0, 11000))
+```
+
+
+```{r}
+# Graph for all types of Scorecards in 2018-2023 for only M
+sc_alldata_onlymems <- sc_alldata_mems %>% 
+  filter(`Member Type` %in% c("M")) %>%
+  unique()
+
+plot_all_onlymems <- ggplot(sc_alldata_onlymems, aes(x = type)) + 
+  geom_bar(stat = "count", fill = "lightgreen") + 
+  geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.25) + 
+  labs(title = "Scorecards from 2018-2023 for Members (MN not included)", x = "SC type" , y = "# of Scorecards") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+plot_all_onlymems + coord_cartesian(ylim = c(0, 11000))
+```
+
+
+```{r}
+# Breakdown of Engagement SC Type
+# Converts "New Member Onboarding from General to Engagement (to prevent overlaps in SC)
+sc_alldata_mems <- sc_alldata_mems %>% mutate(type = ifelse(reasoning == " New Member Onboarding", "Engagement", type))
+sc_alldata_mems <- sc_alldata_mems %>% mutate(reasoning = ifelse(reasoning == " New Member Onboarding", "New Member Onboarding", reasoning))
+```
+
+```{r}
+# Update the 'type' column to 'Outreach' where 'reasoning' contains 'Outreach'
+sc_alldata_mems <- sc_alldata_mems %>%
+  mutate(type = ifelse(str_detect(reasoning, "Outreach"), "Outreach", type))
+```
+
+```{r}
+sc_mems_eng <- sc_alldata_mems %>% filter(type == "Engagement")
+plot_mem_eng <- ggplot(sc_mems_eng, aes(x = sc_mems_eng$reasoning))+ geom_bar(stat = "count", fill = "purple")+ geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.25) +labs(title = "Category of Engagement SC", x = "Reasoning" , y = "# of Scorecards")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+ coord_cartesian(ylim = c(0, 100))  
+plot_mem_eng
+```
+

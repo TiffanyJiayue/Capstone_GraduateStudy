@@ -1,0 +1,203 @@
+---
+title: "Scorecard_Data"
+output:
+  pdf_document: default
+  html_document: default
+date: "2024-01-29"
+---
+
+# OBJECTIVE:
+1. Categorizing relevant SC Types into main categories
+2. Turning the columns SC date and Paid through date into month numbers 
+3. Graph: Scorecards from 2018-2023 for all Members
+4. Graph: Scorecards from 2018-2023 for all General Type
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readxl)
+library(tidyr)
+library(ggplot2)
+library(tidyverse)
+```
+
+```{r}
+# please change "heiyo" to your laptop name
+# Load the Excel file: Scorecards 2018 through 2023.xlsx
+# This chunk of code takes the Scorecard excel file and isolates every sheet by the year.
+
+sc_data <- "/Users/heiyo/Desktop/MQE/Capstone/Scorecards 2018 through 2023.xlsx"
+sheet <- excel_sheets(sc_data)
+sc_2018data <- read_excel(sc_data, sheet = sheet[1])
+sc_2019data <- read_excel(sc_data, sheet = sheet[2])
+sc_2020data <- read_excel(sc_data, sheet = sheet[3])
+sc_2021data <- read_excel(sc_data, sheet = sheet[4])
+sc_2022data <- read_excel(sc_data, sheet = sheet[5])
+sc_2023data <- read_excel(sc_data, sheet = sheet[6])
+sc_alldata <- bind_rows(sc_2018data, sc_2019data, sc_2020data, sc_2021data,
+sc_2022data, sc_2023data)
+```
+
+```{r}
+no_rows <- grepl("No:", sc_alldata$`SC Type`)
+```
+
+```{r}
+sc_alldata$`SC Type`[no_rows] <- gsub("^No: ", "", sc_alldata$'SC Type'[no_rows])
+```
+
+```{r}
+# Separate the values in "SC Type" column into "type" and "reasoning"
+sc_alldata <- separate(sc_alldata, `SC Type`, into = c("type",
+"reasoning"), sep = ":", remove = FALSE)
+# Check for unique values present in the new "type" column
+unique(sc_alldata$type)
+```
+
+```{r}
+sc_alldata <- sc_alldata %>%
+  mutate(type = ifelse(str_detect(reasoning, "Outreach"), "Outreach", type))
+```
+
+```{r}
+# Graph for all types of Scorecards in 2018-2023 for M or MN
+sc_alldata_mems <- sc_alldata %>% 
+  filter(`Member Type` %in% c("M", "MN")) %>%
+  unique()
+```
+
+```{r}
+# The next few chunks of codes shows how many unique values are present for "SC Type" by year
+sc_type2018 <- unique(sc_2018data$`SC Type`)
+sc_type2019 <- unique(sc_2019data$`SC Type`)
+sc_type2020 <- unique(sc_2020data$`SC Type`)
+sc_type2021 <- unique(sc_2021data$`SC Type`)
+sc_type2022 <- unique(sc_2022data$`SC Type`)
+sc_type2023 <- unique(sc_2023data$`SC Type`)
+```
+
+```{r}
+# This chunk separates the values in "SC Type" column into "type" and "reasoning". "type" is the specific scorecard type, whereas the reasoning is the reasoning as to why it belongs into that SC
+sc_2018data <- sc_2018data %>% separate(`SC Type`, into = c("type", "reasoning"), sep = ":", remove = FALSE)
+sc_2019data <- sc_2019data %>% separate(`SC Type`, into = c("type", "reasoning"), sep = ":", remove = FALSE)
+sc_2020data <- sc_2020data %>% separate(`SC Type`, into = c("type", "reasoning"), sep = ":", remove = FALSE)
+sc_2021data <- sc_2021data %>% separate(`SC Type`, into = c("type", "reasoning"), sep = ":", remove = FALSE)
+sc_2022data <- sc_2022data %>% separate(`SC Type`, into = c("type", "reasoning"), sep = ":", remove = FALSE)
+sc_2023data <- sc_2023data %>% separate(`SC Type`, into = c("type", "reasoning"), sep = ":", remove = FALSE)
+```
+
+```{r}
+# Categorizing relevant SC Types into main categories
+# Below converts Fortyx80 values into talent
+sc_alldata_mems <- sc_alldata_mems %>% mutate(type = ifelse(type %in% c("Fortyx80", "FortyX80"), "Talent", type))
+# Below removes all "Past Due" values
+sc_alldata_mems <- sc_alldata_mems %>% filter(type != "Past Due")
+# Below removes the 1 "referral" observation
+sc_alldata_mems <- sc_alldata_mems %>% filter(type != "Referral")
+sc_alldata_mems <- sc_alldata_mems %>% filter(type != "Referral")
+sc_alldata_mems <- sc_alldata_mems %>% filter(type != "Sales")
+```
+
+```{r}
+sc_alldata_mems <- sc_alldata_mems %>%
+  select(-`reasoning`, -`Value`, -`Expected Rate`, -`SC Owner`, -`Category`, -`SCNote`, -`ScorecardEmail`, -`SCDescription`)
+```
+
+```{r}
+write.csv(sc_alldata_mems, 'sc_alldata_mems_forcombine.csv')
+```
+
+```{r}
+# First, we turn the columns SC date and Paid through date into month numbers for sc_alldata
+sc_alldata$SC_date_month <- as.numeric(format(as.Date(sc_alldata$`SC Date`), "%Y")) * 12 +
+                          as.numeric(format(as.Date(sc_alldata$`SC Date`), "%m"))
+sc_alldata$Paid_Through_month <- as.numeric(format(as.Date(sc_alldata$`Paid Through`), "%Y")) * 12 +  as.numeric(format(as.Date(sc_alldata$`Paid Through`), "%m"))
+# Create column datediff, which is the timing variable (Timing of SC from renewal date)
+sc_alldata$datediff <- sc_alldata$Paid_Through_month - sc_alldata$SC_date_month
+```
+
+```{r}
+plot_allmems <- ggplot(sc_alldata_mems, aes(x = type)) +
+  geom_bar(stat = "count", fill = "lightblue") + 
+  geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.25) + 
+  labs(title = "Scorecards from 2018-2023 for all Members", x = "SC type", y = "# of Scorecards") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+plot_allmems + coord_cartesian(ylim = c(0, 11000))
+```
+
+```{r}
+sc_2023data <- sc_2023data %>%
+  select(-`SCNote`, -`ScorecardEmail`,  -`SCDescription`)
+```
+
+```{r}
+sc_2023data <- sc_2023data %>%
+  filter(Company != "(Erased)")
+```
+
+```{r}
+sc_2023data <- sc_2023data %>%
+  select(-`SC Entry Date`)
+```
+
+```{r}
+sc_2023data <- sc_2023data %>%
+  mutate(Month_Difference = floor(as.numeric(difftime(`Paid Through`, `SC Date`, units = "weeks")) / 4.345))
+```
+
+#### For General column ####
+```{r}
+sc_2018data <- sc_2018data %>%
+  filter(str_detect(type, "General"))
+sc_2019data <- sc_2019data %>%
+  filter(str_detect(type, "General"))
+sc_2020data <- sc_2020data %>%
+  filter(str_detect(type, "General"))
+sc_2021data <- sc_2021data %>%
+  filter(str_detect(type, "General"))
+sc_2022data <- sc_2022data %>%
+  filter(str_detect(type, "General"))
+sc_2023data <- sc_2023data %>%
+  filter(str_detect(type, "General"))
+```
+
+```{r}
+combined_general_data <- rbind(sc_2018data, sc_2019data, sc_2020data, sc_2021data, sc_2022data, sc_2023data)
+```
+
+```{r}
+filtered_combined_general_data <- combined_general_data %>%
+  filter(`Member Type` %in% c("M", "MN"))
+```
+
+```{r}
+filtered_combined_general_data <- filtered_combined_general_data %>%
+  filter(trimws(reasoning) != "Health Insurance Audit/New Sale")
+```
+
+```{r}
+# Update the 'type' column to 'Outreach' where 'reasoning' contains 'Outreach'
+new_filtered_combined_general_data <- filtered_combined_general_data %>%
+  mutate(type = ifelse(str_detect(reasoning, "Outreach"), "Outreach", type))
+```
+
+```{r}
+# remove "Outreach" in the general data
+new_filtered_combined_general_data <- new_filtered_combined_general_data %>% filter(type != "Outreach")
+```
+
+```{r}
+# remove "New Member Onboarding"
+new_filtered_combined_general_data <- new_filtered_combined_general_data %>%
+  filter(trimws(reasoning) != "New Member Onboarding")
+```
+
+```{r}
+plot_all_general <- ggplot(new_filtered_combined_general_data, aes(x = new_filtered_combined_general_data$reasoning))+ geom_bar(stat = "count", fill = "purple")+ geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.25) +labs(title = "Scorecards from 2018-2023 for all General Type", x = "SC type" , y = "# of Scorecards")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+plot_all_general + coord_cartesian(ylim = c(0, 220))
+```
+
+
