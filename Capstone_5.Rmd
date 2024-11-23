@@ -1,9 +1,11 @@
 ---
-title: "EventParticipation_Update"
+title: "EventParticipation_Update (Continue)"
 output: html_document
 date: "2024-03-12"
 ---
-
+# NOTE: NEW CODE STARTS FROM ROW 204
+# OBJECTIVE: 
+1. 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -198,8 +200,8 @@ unique_titles_with_na_event_date <- unique(titles_with_na_event_date)
 print(unique_titles_with_na_event_date)
 # below 28 events do not has event date information.
 ```
-# Create monthly indicator 
 
+# Create monthly indicator 
 ############# FOR EVENT #############
 
 ```{r}
