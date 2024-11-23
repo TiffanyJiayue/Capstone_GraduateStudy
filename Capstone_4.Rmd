@@ -24,7 +24,7 @@ library(dplyr)
 # ++++++++++++ Cross Event ++++++++++++++++ #
 ```{r}
 # using the cross event data #
-cross_data <- "/Users/heiyo/Desktop/MQE/Capstone/Cross-Event_40_Events_Sales_Summary_Excel_93284519469_20240201_2114.xlsx"
+cross_data <- "/Users/XXX/Cross-Event_40_Events_Sales_Summary_Excel_93284519469_20240201_2114.xlsx"
 cross_data <- read_excel(cross_data)
 ```
 
@@ -69,7 +69,7 @@ cleaned_cross <- cleaned_cross %>%
 
 # ++++++++++++ CleanedMember.EventParticipation ++++++++++++++++ #
 ```{r}
-Cleaned_eventdate <- read.csv("/Users/heiyo/Desktop/MQE/Capstone/CleanedMember.EventParticipation.csv")
+Cleaned_eventdate <- read.csv("/Users/XXX/CleanedMember.EventParticipation.csv")
 ```
 
 ```{r}
@@ -107,7 +107,7 @@ write.csv(Merge_Cleaned_eventdate, file = "AllEventDate.csv", row.names = FALSE)
 
 # ++++++++++++ Attendee data ++++++++++++++++ #
 ```{r}
-att_data <- "/Users/heiyo/Desktop/MQE/Capstone/Event Attendees 2018 through 2023.xlsx"
+att_data <- "/Users/XXX/Event Attendees 2018 through 2023.xlsx"
 sheet <- excel_sheets(att_data)
 att_2018data <- read_excel(att_data, sheet = sheet[1])
 att_2019data <- read_excel(att_data, sheet = sheet[2])
@@ -238,7 +238,7 @@ new_merged_df <- merged_df %>%
 ```
 
 ```{r}
-mem_data <- read.csv("/Users/heiyo/Desktop/MQE/Capstone/mem_data.csv")
+mem_data <- read.csv("/Users/XXX/mem_data.csv")
 ```
 
 ```{r}
