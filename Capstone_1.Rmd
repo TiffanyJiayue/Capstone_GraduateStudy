@@ -26,9 +26,9 @@ library(ggplot2)
 # How is the variable of event participation linked to member renewal? #
 #### For Attendee data ####
 ```{r}
-# please change "heiyo" to your laptop name
+# please change "XXX" to your laptop name
 # Load the Excel file: Event Attendees 2018 through 2023.xlsx
-att_data <- "/Users/heiyo/Desktop/MQE/Capstone/Event Attendees 2018 through 2023.xlsx"
+att_data <- "/Users/XXX/Event Attendees 2018 through 2023.xlsx"
 sheet <- excel_sheets(att_data)
 att_2018data <- read_excel(att_data, sheet = sheet[1])
 att_2019data <- read_excel(att_data, sheet = sheet[2])
@@ -104,7 +104,7 @@ print(unique_register_types)
 #### For Non-Participant data ####
 ```{r}
 # Load the Excel file: NonParticipant.Members.LastYear.xlsx
-Nonpartipant_data <-read_excel("/Users/heiyo/Desktop/MQE/Capstone/NonParticipant.Members.LastYear.xlsx") 
+Nonpartipant_data <-read_excel("/Users/XXX/NonParticipant.Members.LastYear.xlsx") 
 ```
 
 ```{r}
@@ -161,7 +161,7 @@ nonpart_plot
 #### For Current Member data ####
 ```{r}
 # Load the Excel file: Current.Members.JoinDate.xlsx
-CurrentMember_data <-read_excel("/Users/heiyo/Desktop/MQE/Capstone/Current.Members.JoinDate.xlsx") 
+CurrentMember_data <-read_excel("/Users/XXX/Current.Members.JoinDate.xlsx") 
 ```
 
 ```{r}
