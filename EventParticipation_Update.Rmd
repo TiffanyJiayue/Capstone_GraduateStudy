@@ -1,0 +1,279 @@
+---
+title: "EventParticipation_Update"
+output: html_document
+date: "2024-03-12"
+---
+
+# OBJECTIVE: 
+1. Preparing CrossEvent dataset (Date Format)
+2. Preparing MembeParticipation dataset
+3. Merge two datasets: Cross Event + CleanedMember.EventParticipation 
+4. The new dataset has all the event dates get from Cross Event dataset and CleanedMember.EventParticipation dataset (AllEventDate.csv)
+5. Preparing  Attendee data
+6. Merge event date to the event att dataset based on "Title"
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readxl)
+library(dplyr)
+```
+
+# ++++++++++++ Cross Event ++++++++++++++++ #
+```{r}
+# using the cross event data #
+cross_data <- "/Users/heiyo/Desktop/MQE/Capstone/Cross-Event_40_Events_Sales_Summary_Excel_93284519469_20240201_2114.xlsx"
+cross_data <- read_excel(cross_data)
+```
+
+```{r}
+# clean cross event data, only left 'event name' and 'event start date' 
+cleaned_cross <- cross_data %>%
+  select(`Event Name`, `Event Start Date`)
+```
+
+```{r}
+# remove the part of time, only left date
+cleaned_cross$`Event Start Date` <- sub(" .*", "", cleaned_cross$`Event Start Date`)
+```
+
+```{r}
+# remove the repeat event name
+cleaned_cross <- unique(cleaned_cross[, c("Event Name", "Event Start Date")])
+```
+
+```{r}
+# rename the col names, prepare for merge with CleanedMember.EventParticipation.csv
+names(cleaned_cross)[names(cleaned_cross) == "Event Name"] <- "Title"
+names(cleaned_cross)[names(cleaned_cross) == "Event Start Date"] <- "Event.Date"
+```
+
+```{r}
+# change the date formate
+cleaned_cross <- cleaned_cross %>%
+  mutate(`Event.Date` = as.Date(`Event.Date`, format = "%m/%d/%y"))
+```
+
+```{r}
+# still change the date formate
+cleaned_cross <- cleaned_cross %>%
+  mutate(Event.Date = format(as.Date(Event.Date, format = "%m/%d/%y"), "%Y-%m-%d"))
+```
+
+```{r}
+# This csv contains the event date get from the cross event data
+# write.csv(cleaned_cross, file = "CleanedCrossEventDate.csv", row.names = FALSE)
+```
+
+# ++++++++++++ CleanedMember.EventParticipation ++++++++++++++++ #
+```{r}
+Cleaned_eventdate <- read.csv("/Users/heiyo/Desktop/MQE/Capstone/CleanedMember.EventParticipation.csv")
+```
+
+```{r}
+# only left the 'Title' (Event name) and 'Event.Date' 
+Cleaned_eventdate <- Cleaned_eventdate %>%
+  select(`Title`, `Event.Date`)
+```
+
+```{r}
+# remove repeat variables
+Cleaned_eventdate <- unique(Cleaned_eventdate[, c("Title", "Event.Date")])
+```
+
+```{r}
+# rename
+Cleaned_eventdate$Title <- sub("*** postponed-Hire UP: College & University Recruiting", "Hire UP: College & University Recruiting", Cleaned_eventdate$Title, fixed = TRUE)
+```
+
+# ++++++++++++ Cross Event + CleanedMember.EventParticipation ++++++++++++++++ #
+```{r}
+# merging the event date from cross event data and CleanedMember.EventParticipation data
+Merge_Cleaned_eventdate <- merge(Cleaned_eventdate,cleaned_cross, by = c("Title", "Event.Date"), all = TRUE) 
+# 365 events 
+```
+
+```{r}
+Merge_Cleaned_eventdate <- unique(Merge_Cleaned_eventdate[, c("Title", "Event.Date")])
+# 365, no repeat event
+```
+
+```{r}
+# this dataset has all the event dates get from Cross Event dataset and CleanedMember.EventParticipation dataset
+write.csv(Merge_Cleaned_eventdate, file = "AllEventDate.csv", row.names = FALSE)
+```
+
+# ++++++++++++ Attendee data ++++++++++++++++ #
+```{r}
+att_data <- "/Users/heiyo/Desktop/MQE/Capstone/Event Attendees 2018 through 2023.xlsx"
+sheet <- excel_sheets(att_data)
+att_2018data <- read_excel(att_data, sheet = sheet[1])
+att_2019data <- read_excel(att_data, sheet = sheet[2])
+att_2020data <- read_excel(att_data, sheet = sheet[3])
+att_2021data <- read_excel(att_data, sheet = sheet[4])
+att_2022data <- read_excel(att_data, sheet = sheet[5])
+att_2023data <- read_excel(att_data, sheet = sheet[6])
+```
+
+```{r}
+# select the col `Company`, `Title`, `Company Member Type`, `Paid Through`
+cleaned_18att <- att_2018data %>%
+  select(`Company`, `Title`, `Company Member Type`, `Paid Through`)
+cleaned_19att <- att_2019data %>%
+  select(`Company`, `Title`, `Company Member Type`, `Paid Through`)
+cleaned_20att <- att_2020data %>%
+  select(`Company`, `Title`, `Company Member Type`, `Paid Through`)
+cleaned_21att <- att_2021data %>%
+  select(`Company`, `Title`, `Company Member Type`, `Paid Through`)
+cleaned_22att <- att_2022data %>%
+  select(`Company`, `Title`, `Company Member Type`, `Paid Through`)
+cleaned_23att <- att_2023data %>%
+  select(`Company`, `Title`, `Company Member Type`, `Paid Through`)
+```
+
+```{r}
+# remove the NA 
+cleaned_18att <- subset(cleaned_18att, !is.na(`Company Member Type`) & !is.na(`Paid Through`))
+cleaned_19att <- subset(cleaned_19att, !is.na(`Company Member Type`) & !is.na(`Paid Through`))
+cleaned_20att <- subset(cleaned_20att, !is.na(`Company Member Type`) & !is.na(`Paid Through`))
+cleaned_21att <- subset(cleaned_21att, !is.na(`Company Member Type`) & !is.na(`Paid Through`))
+cleaned_22att <- subset(cleaned_22att, !is.na(`Company Member Type`) & !is.na(`Paid Through`))
+cleaned_23att <- subset(cleaned_23att, !is.na(`Company Member Type`) & !is.na(`Paid Through`))
+```
+
+```{r}
+# some repeat, because different people from the same company attend the same event.......
+# remove the repeat company name.....
+unique_cleaned_23att <- unique(cleaned_23att[, c("Company", "Title", "Paid Through", "Company Member Type")])
+unique_cleaned_22att <- unique(cleaned_22att[, c("Company", "Title", "Paid Through", "Company Member Type")])
+unique_cleaned_21att <- unique(cleaned_21att[, c("Company", "Title", "Paid Through", "Company Member Type")])
+unique_cleaned_20att <- unique(cleaned_20att[, c("Company", "Title", "Paid Through", "Company Member Type")])
+unique_cleaned_19att <- unique(cleaned_19att[, c("Company", "Title", "Paid Through", "Company Member Type")])
+unique_cleaned_18att <- unique(cleaned_18att[, c("Company", "Title", "Paid Through", "Company Member Type")])
+```
+
+```{r}
+# merge 1028- 2023 dataset to one dataset
+Merge_Cleaned_eventatt <- merge(unique_cleaned_23att, unique_cleaned_22att, by = c("Company", "Title", "Paid Through", "Company Member Type"), all = TRUE)
+```
+
+```{r}
+Merge_Cleaned_eventatt <- merge(Merge_Cleaned_eventatt, unique_cleaned_21att, by = c("Company", "Title", "Paid Through", "Company Member Type"), all = TRUE)  
+Merge_Cleaned_eventatt <- merge(Merge_Cleaned_eventatt, unique_cleaned_20att, by = c("Company", "Title", "Paid Through", "Company Member Type"), all = TRUE)  
+Merge_Cleaned_eventatt <- merge(Merge_Cleaned_eventatt, unique_cleaned_19att, by = c("Company", "Title", "Paid Through", "Company Member Type"), all = TRUE)  
+Merge_Cleaned_eventatt <- merge(Merge_Cleaned_eventatt, unique_cleaned_18att, by = c("Company", "Title", "Paid Through", "Company Member Type"), all = TRUE)  
+```
+
+```{r}
+unique_titles <- unique(Merge_Cleaned_eventatt$Title)
+unique_title_count <- length(unique_titles)
+unique_title_count
+# Merge_Cleaned_eventatt has 279 different events
+```
+
+# +++++++++++++ Merge event date to the event att dataset based on "Title" +++++++++++++++++ #
+```{r}
+merged_df <- Merge_Cleaned_eventatt %>%
+  left_join(select(Merge_Cleaned_eventdate, Title, Event.Date), by = "Title")
+```
+
+```{r}
+# this dataset is the cleaned dataset with "Company" "Title" (Event Name), "Paid Through" (Paid Through Date), "Company Member Type", "Event.Date" (Event Date)
+write.csv(merged_df, file = "Att_with_eventdate.csv", row.names = FALSE)
+```
+
+```{r}
+# Some Event Date are "NA"
+# Check how many NA (762)
+event_dates_count <- sum(!is.na(merged_df$Event.Date))
+print(event_dates_count) # 8621
+na_count <- sum(is.na(merged_df$Event.Date))
+print(na_count) # 762
+```
+
+```{r}
+# Check what event does not has the "Event Date"
+# 28 events do not has the event date...................
+titles_with_na_event_date <- merged_df$Title[is.na(merged_df$Event.Date)]
+unique_titles_with_na_event_date <- unique(titles_with_na_event_date)
+print(unique_titles_with_na_event_date)
+# below 28 events do not has event date information.
+```
+############# UPDATE #############
+```{r}
+merged_df <- na.omit(merged_df)
+# 8617 obs
+```
+
+```{r}
+merged_df <- merged_df %>%
+  select(-`Title`)
+```
+
+```{r}
+# Load the lubridate package for date manipulation
+library(lubridate)
+# Define the start date
+start_date <- as.Date("2018-01-01")
+# Define the end date
+end_date <- as.Date("2023-12-31")
+# Calculate the number of months since start_date for each date in the 'Event.Date' column
+merged_df$Month <- 12 * (year(merged_df$Event.Date) - year(start_date)) + month(merged_df$Event.Date) - month(start_date) + 1
+```
+
+```{r}
+merged_df$Event_Frequency <- 1
+# all become one, however, BUT what if a company participates in multiple events in the same month?
+```
+
+```{r}
+# this way will let the frequency represent the number of times it participates in the event
+new_merged_df <- merged_df %>%
+  group_by(Company, Month) %>%
+  mutate(Event_Frequency = n()) %>%
+  distinct(Company, Month, .keep_all = TRUE)
+# 7354 obs
+```
+
+```{r}
+mem_data <- read.csv("/Users/heiyo/Desktop/MQE/Capstone/mem_data.csv")
+```
+
+```{r}
+# Install the sqldf package from CRAN if you haven't already
+# install.packages("sqldf")
+# Load the sqldf library
+
+library(sqldf)
+
+# Perform a left join operation selecting only the required columns
+mem_data <- sqldf("SELECT mem_data.*, new_merged_df.Event_Frequency 
+                   FROM mem_data 
+                   LEFT JOIN new_merged_df 
+                   USING (Month, Company)")
+
+# check: same 208512 -> correct
+```
+
+```{r}
+# Replace NA values in the "event_frequency" column with 0
+mem_data$Event_Frequency[is.na(mem_data$Event_Frequency)] <- 0
+```
+
+
+```{r}
+# this dataset is the cleaned dataset with "Company" "Title" (Event Name), "Paid Through" (Paid Through Date), "Company Member Type", "Event.Date" (Event Date)
+write.csv(mem_data, file = "mem_data_new.csv", row.names = FALSE)
+```
+
+
+
+
+
+
+
+
+
+
