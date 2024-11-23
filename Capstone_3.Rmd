@@ -24,11 +24,11 @@ library(tidyverse)
 ```
 
 ```{r}
-# please change "heiyo" to your laptop name
+# please change "XXX" to your laptop name
 # Load the Excel file: Scorecards 2018 through 2023.xlsx
 # This chunk of code takes the Scorecard excel file and isolates every sheet by the year.
 
-sc_data <- "/Users/heiyo/Desktop/MQE/Capstone/Scorecards 2018 through 2023.xlsx"
+sc_data <- "/Users/XXX/Scorecards 2018 through 2023.xlsx"
 sheet <- excel_sheets(sc_data)
 sc_2018data <- read_excel(sc_data, sheet = sheet[1])
 sc_2019data <- read_excel(sc_data, sheet = sheet[2])
