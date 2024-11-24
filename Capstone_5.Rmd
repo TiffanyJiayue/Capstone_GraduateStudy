@@ -5,7 +5,8 @@ date: "2024-03-12"
 ---
 # NOTE: NEW CODE STARTS FROM ROW 204
 # OBJECTIVE: 
-1. 
+1. Create monthly indicator for each event
+2. 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -28,8 +29,6 @@ cleaned_cross <- cross_data[, c("Event Name", "Event Start Date")]
 
 # Check the structure of the cleaned dataset
 str(cleaned_cross)
-
-
 ```
 
 ```{r}
@@ -106,7 +105,7 @@ write.csv(Merge_Cleaned_eventdate, file = "AllEventDate.csv", row.names = FALSE)
 
 # ++++++++++++ Attendee data ++++++++++++++++ #
 ```{r}
-att_data <- "/Users/heiyo/Desktop/MQE/Capstone/Event Attendees 2018 through 2023.xlsx"
+att_data <- "/Users/XXX/Event Attendees 2018 through 2023.xlsx"
 sheet <- excel_sheets(att_data)
 att_2018data <- read_excel(att_data, sheet = sheet[1])
 att_2019data <- read_excel(att_data, sheet = sheet[2])
@@ -203,18 +202,15 @@ print(unique_titles_with_na_event_date)
 
 # Create monthly indicator 
 ############# FOR EVENT #############
-
 ```{r}
 merged_df <- na.omit(merged_df)
 # 8617 obs
 ```
 
-
 ```{r}
 merged_df <- merged_df %>%
   select(-`Title`)
 ```
-
 
 ```{r}
 # Load the lubridate package for date manipulation
@@ -227,12 +223,10 @@ end_date <- as.Date("2023-12-31")
 merged_df$Month <- 12 * (year(merged_df$Event.Date) - year(start_date)) + month(merged_df$Event.Date) - month(start_date) + 1
 ```
 
-
 ```{r}
 merged_df$Event_Frequency <- 1
 # all become one, however, BUT what if a company participates in multiple events in the same month?
 ```
-
 
 ```{r}
 # this way will let the frequency represent the number of times it participates in the event
@@ -243,17 +237,14 @@ new_merged_df <- merged_df %>%
 # 7354 obs
 ```
 
-
 ```{r}
-#write.csv(mem_data, file = "/Users/heiyo/Desktop/MQE/Capstone/mem_data.csv", row.names = FALSE)
+#write.csv(mem_data, file = "/Users/XXX/mem_data.csv", row.names = FALSE)
 ```
 
-
 ```{r}
-mem_data <- read.csv("/Users/heiyo/Desktop/MQE/Capstone/mem_data_with_noeventandbenefic.csv")
+mem_data <- read.csv("/Users/XXX/mem_data_with_noeventandbenefic.csv")
 # data from Neel
 ```
-
 
 ```{r}
 # Install the sqldf package from CRAN if you haven't already
@@ -274,7 +265,6 @@ mem_data$Event_Frequency[is.na(mem_data$Event_Frequency)] <- 0
 ```
 
 ################### UPDATE FOR BP ##############
-
 ```{r}
 #install.packages("openxlsx")
 ```
@@ -282,7 +272,7 @@ mem_data$Event_Frequency[is.na(mem_data$Event_Frequency)] <- 0
 ```{r}
 library(openxlsx)
 # Specify the file path for the Excel file
-#excel_file_path <- "/Users/heiyo/Desktop/MQE/Capstone/mem_data.xlsx"
+#excel_file_path <- "/Users/heiyo/XXX/mem_data.xlsx"
 # Export mem_data as an Excel file
 #write.xlsx(mem_data, file = excel_file_path, rowNames = FALSE)
 # Provide a message indicating successful export
@@ -312,14 +302,14 @@ cat("Number of non-zero values in the Event_Frequency column:", non_zero_count, 
 ```{r}
 # Load necessary libraries
 library(openxlsx)
-benefit_participants <- read.xlsx("/Users/heiyo/Desktop/MQE/Capstone/BenefitParticipants.xlsx")
+benefit_participants <- read.xlsx("/Users/XXX/BenefitParticipants.xlsx")
 # Extract the list of companies that used benefits
 benefit_companies <- unique(benefit_participants$Company)
 # Create a new column in mem_data called "benefit_usage" initialized with 0
 mem_data$Benefit_Usage <- 0
 # If appear in BenefitParticipants, = 1
 mem_data$Benefit_Usage[mem_data$Company %in% benefit_companies] <- 1
-#write.xlsx(mem_data, file = "/Users/heiyo/Desktop/MQE/Capstone/mem_data_with_benefit_usage.xlsx", rowNames = FALSE)
+#write.xlsx(mem_data, file = "/Users/XXX/mem_data_with_benefit_usage.xlsx", rowNames = FALSE)
 #cat("mem_data with benefit_usage column has been exported as an Excel file.\n")
 ```
 
@@ -349,7 +339,7 @@ mem_data <- mem_data %>%
 
 ######## UPDATE SCORECARD #######
 ```{r}
-scorecard_data <- read.csv("/Users/heiyo/Desktop/MQE/Capstone/sc_alldata_mems_forcombine.csv")
+scorecard_data <- read.csv("/Users/XXX/sc_alldata_mems_forcombine.csv")
 # 19649 observations
 ```
 
