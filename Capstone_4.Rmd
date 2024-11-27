@@ -245,15 +245,12 @@ mem_data <- read.csv("/Users/XXX/mem_data.csv")
 # Install the sqldf package from CRAN if you haven't already
 # install.packages("sqldf")
 # Load the sqldf library
-
 library(sqldf)
-
 # Perform a left join operation selecting only the required columns
 mem_data <- sqldf("SELECT mem_data.*, new_merged_df.Event_Frequency 
                    FROM mem_data 
                    LEFT JOIN new_merged_df 
                    USING (Month, Company)")
-
 # check: same 208512 -> correct
 ```
 
@@ -262,18 +259,9 @@ mem_data <- sqldf("SELECT mem_data.*, new_merged_df.Event_Frequency
 mem_data$Event_Frequency[is.na(mem_data$Event_Frequency)] <- 0
 ```
 
-
 ```{r}
 # this dataset is the cleaned dataset with "Company" "Title" (Event Name), "Paid Through" (Paid Through Date), "Company Member Type", "Event.Date" (Event Date)
 write.csv(mem_data, file = "mem_data_new.csv", row.names = FALSE)
 ```
-
-
-
-
-
-
-
-
 
 
