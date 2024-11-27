@@ -10,6 +10,13 @@ date: "2024-03-12"
 3. Create binary col for scorecard column.
 4. Add company category to mem_data.
 5. Plot how many current members in each category.
+6. Focus on a specific type category company to make some analysis.
+7. Make a plot of "Behavior Comparison between First Six Months and Second Six Months.
+8. Add confidence intervals for each bar.
+9. Plot how much percentage of Member Usage Before Leaving PTC. ("Event_Participation", "Benefit_Usage", "SC.BusinessDevelopment", "SC.Outreach", "SC.Visibility", "SC.Talent", "SC.Advocacy", "SC.Engagement", "SC.Benefits")
+10. Comparison of Event Participation (First Year vs Last Year).
+11. Different plots to see which one works better.
+12. Run a survival model, ask prof later to improve.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -680,9 +687,9 @@ company_counts <- final_data %>%
 
 print(company_counts)
 ```
+
 ```{r}
 library(ggplot2)
-
 ggplot(company_counts, aes(x = Category, y = num_companies)) +
   geom_bar(stat = "identity", fill = "skyblue") +
   geom_text(aes(label = num_companies), vjust = -0.5, size = 3) + 
@@ -691,9 +698,7 @@ ggplot(company_counts, aes(x = Category, y = num_companies)) +
        y = "Number of Companies") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
 ```
-
 
 # How many contiunous_Members from 2018 Jan - 2023 Dec
 ```{r}
@@ -735,8 +740,6 @@ ggplot(member1, aes(x = `Member Type`, fill = `Member Type`)) +
   geom_text(stat='count', aes(label=..count..), vjust=-0.5, size=3, color="black") +
   labs(x = "Category", y = "Count", title = "Category Distribution among Current Members") +
   theme_minimal()
-
-
 ```
 
 ```{r}
@@ -752,7 +755,6 @@ ggplot(plot_data, aes(x = Category, y = Count)) +
        y = "Count") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
 ```
 
 ```{r}
@@ -767,28 +769,20 @@ Pitt.Gray <- "#97999B"
 Pitt.LGray <- "#C8C9C7"
 ```
 
-
 final_data <- final_data %>%
   select(-`X`, -`Rejoin_Date_Months`, -`Paid_Through_Months`, -`Join_Date_Months`, -`Month_value`)
 
-
 ```{r}
 library(dplyr)
-
 # Assuming 'final_data' is your data frame
-
 # Extract the Rejoin_Date column
 rejoin_date_col <- pull(final_data, Rejoin_Date)
-
 # Remove the Rejoin_Date column from the data frame
 final_data <- final_data %>%
   select(-Rejoin_Date)
-
 # Append the Rejoin_Date column to the end of the data frame
 final_data$Rejoin_Date <- rejoin_date_col
-
 # Now Rejoin_Date should be the last column in the data frame
-
 ```
 
 ```{r}
@@ -827,7 +821,6 @@ only1yr_technology_data <- only1yr_technology_data %>%
     7 <= Cumulative_Status & Cumulative_Status <= 12 ~ "Second_Six_Months",
     TRUE ~ "Beyond_Twelve_Months" # Add more conditions if needed
   ))
-
 ```
 
 ```{r}
@@ -936,9 +929,8 @@ plot_second_six <- plot_bars(second_six_data, "Behavior Comparison - Second Six 
 # Display the plots
 plot_first_six
 plot_second_six
-
-
 ```
+
 ##########
 # TU 
 ```{r}
@@ -1132,16 +1124,11 @@ ggplot(final_data_long, aes(x = Behavior, y = Percentage, fill = Category)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 4.5)) +
   facet_wrap(~ Category, nrow = 1)  # Separate plots by company category
-
-
 ```
 
 # For Tech
 ```{r}
 library(ggplot2)
-
-# Assuming 'final_data' is your dataset
-
 # Step 1: Filter rows where Member_Status transitions from 1 to 0
 transition_rows <- final_data %>%
   filter(Member_Status == 1 & lead(Member_Status) == 0)
@@ -1191,12 +1178,6 @@ for (category in categories) {
 }
 
 ```
-
-
-
-
-
-
 
 #################################
 ```{r}
@@ -1512,6 +1493,7 @@ ggplot(plot_data_more_than_2, aes(x = Feature, y = Percentage, fill = Year)) +
 
 
 ##### survival model ######
+##### # Just trying run a model first, discuss and ask prof for more details ######
 ```{r}
 #install.packages("survival")
 library(survival)
@@ -1538,7 +1520,6 @@ filtered_data <- filtered_data %>%
 
 
 ```{r}
-
 # Perform survival analysis using Cox proportional hazards regression
 surv_obj <- Surv(time = filtered_data$Month, event = filtered_data$Member_Status)
 # Define the formula for the survival model
@@ -1551,6 +1532,7 @@ surv_model <- coxph(surv_formula, data = filtered_data)
 summary(surv_model)
 # 915 companies
 ```
+
 ```{r}
 library(dplyr)
 
@@ -1560,25 +1542,8 @@ num_companies <- filtered_data %>%
   n_distinct()  # Count the number of distinct companies
 
 print(num_companies)
-
 ```
 
-
-# claude
-# filter 1, drop who join later, who is 0 later
-# count the memer over years (are they losing members)
-# event
-
-# how organize data
-# pattern
-#
-
-# engagement to outreach
-# limited members for four years
-
-# track - > outreach incraese
-# long term member graph
-```
 
 
 
