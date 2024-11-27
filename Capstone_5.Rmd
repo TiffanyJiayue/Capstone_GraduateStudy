@@ -3,10 +3,13 @@ title: "EventParticipation_Update (Continue)"
 output: html_document
 date: "2024-03-12"
 ---
-# NOTE: NEW CODE STARTS FROM ROW 204
+# NOTE: NEW CODE STARTS FROM ROW 267
 # OBJECTIVE: 
-1. Create monthly indicator for each event
-2. 
+1. Check if there are any numbers other than 0 in the Event_Frequency column.
+2. Change all the non-zero value in the event frequency column to 1. (Binary)
+3. Create binary col for scorecard column.
+4. Add company category to mem_data.
+5. Plot how many current members in each category.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -272,7 +275,7 @@ mem_data$Event_Frequency[is.na(mem_data$Event_Frequency)] <- 0
 ```{r}
 library(openxlsx)
 # Specify the file path for the Excel file
-#excel_file_path <- "/Users/heiyo/XXX/mem_data.xlsx"
+#excel_file_path <- "/Users/XXX/mem_data.xlsx"
 # Export mem_data as an Excel file
 #write.xlsx(mem_data, file = excel_file_path, rowNames = FALSE)
 # Provide a message indicating successful export
@@ -361,9 +364,9 @@ scorecard_data$Month <- 12 * (year(scorecard_data$SC.Date) - year(start_date)) +
 #  "Advocacy"             "Engagement"           "Benefits"             "General" 
 ```
 
-#### after creating binary col for scorecard, I find that our mem_data has mistake,(a lot of replicating rows, for example Company Name'3Cloud', '4th Source'......) #### ( I didn't realize this issue until I trying to figure out what is the meaning of Payment.Amount, and the month value of those companies are repeated twice. I don't know how to fix it, and it is too late and I got a little bit sore throat.) ####
+#### after creating binary col for scorecard, I find that our mem_data has mistake,(a lot of replicating rows, for example Company Name'3Cloud', '4th Source'......) #### ( I didn't realize this issue until I trying to figure out what is the meaning of Payment.Amount, and the month value of those companies are repeated twice.  ####
 
-#### for creating binary col, i tried to create cols such as SC.BusinessDevelopment, SC.Outreach...in scorecard data and then merge to mem_data, but a lot of duplicate cols... therefore, I do each type seperatly.
+#### for creating binary col, i tried to create cols such as SC.BusinessDevelopment, SC.Outreach...in scorecard data and then merge to mem_data, but a lot of duplicate cols. therefore, I do each type seperatly.
 
 #### For SC.BusinessDevelopment ####
 ```{r}
@@ -388,7 +391,7 @@ aggregated_BD_scorecard_data <- BD_scorecard_data %>%
 ```{r}
 mem_data <- merge(mem_data, aggregated_BD_scorecard_data[, c("Company", "Month", "SC.BusinessDevelopment")], 
                   by = c("Company", "Month"), all.x = TRUE)
-# finally............
+# finally.
 ```
 
 ```{r}
@@ -637,11 +640,8 @@ print(dup_row_data)
 ```
 #### ADD COMPANY CATEGORY ####
 ```{r}
-category_data <- read.csv("/Users/heiyo/Desktop/MQE/Capstone/company_catergory.csv")
+category_data <- read.csv("/Users/XXX/company_catergory.csv")
 ```
-
-
-
 ```{r}
 #write.csv(mem_data,"final_data.csv")
 ```
@@ -720,16 +720,16 @@ category_counts <- table(current_members$Category)
 print(category_counts)
 # 839
 ```
+
 # Plot How many current members (category)
 ```{r}
-member_data <- "/Users/heiyo/Desktop/MQE/Capstone/Current.Members.JoinDate.xlsx"
+member_data <- "/Users/XXX/Current.Members.JoinDate.xlsx"
 sheet <- excel_sheets(member_data)
 member1 <- read_excel(member_data, sheet = sheet[1])
 ```
 
 ```{r}
 library(ggplot2)
-
 ggplot(member1, aes(x = `Member Type`, fill = `Member Type`)) +
   geom_bar() +
   geom_text(stat='count', aes(label=..count..), vjust=-0.5, size=3, color="black") +
@@ -738,8 +738,6 @@ ggplot(member1, aes(x = `Member Type`, fill = `Member Type`)) +
 
 
 ```
-
-
 
 ```{r}
 library(ggplot2)
