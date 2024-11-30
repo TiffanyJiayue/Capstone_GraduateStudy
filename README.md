@@ -114,4 +114,6 @@ This project provides actionable insights into member renewals:
 ## Contact
 For any questions or further details, please reach out via GitHub.
 
+## Dataset Information
+The dataset required for this project is described in detail in the [Dataset Documentation](DATASET.md).
 
