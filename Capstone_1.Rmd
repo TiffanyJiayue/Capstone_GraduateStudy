@@ -26,7 +26,7 @@ library(ggplot2)
 # Some brainstorm (scorecard datasets)
 # How many different type of scorecards?
 ```{r}
-sc_data <- "/Users/heiyo/Documents/Pitt/MQE学习/MQE/Capstone/Scorecards 2018 through 2023.xlsx"
+sc_data <- "/Users/XXX/Capstone/Scorecards 2018 through 2023.xlsx"
 sheet <- excel_sheets(sc_data)
 sc_2018data <- read_excel(sc_data, sheet = sheet[1])
 sc_2019data <- read_excel(sc_data, sheet = sheet[2])
@@ -65,7 +65,7 @@ print(unique_sccounts)
 ```{r}
 # please change "heiyo" to your laptop name
 # Load the Excel file: Event Attendees 2018 through 2023.xlsx
-att_data <- "/Users/heiyo/Documents/Pitt/MQE学习/MQE/Capstone/Event Attendees 2018 through 2023.xlsx"
+att_data <- "/Users/XXX/Capstone/Event Attendees 2018 through 2023.xlsx"
 sheet <- excel_sheets(att_data)
 att_2018data <- read_excel(att_data, sheet = sheet[1])
 att_2019data <- read_excel(att_data, sheet = sheet[2])
@@ -155,7 +155,7 @@ print(unique_register_types)
 #### For Non-Participant data ####
 ```{r}
 # Load the Excel file: NonParticipant.Members.LastYear.xlsx
-Nonpartipant_data <-read_excel("/Users/heiyo/Desktop/MQE/Capstone/NonParticipant.Members.LastYear.xlsx") 
+Nonpartipant_data <-read_excel("/Users/XXX/Capstone/NonParticipant.Members.LastYear.xlsx") 
 ```
 
 ```{r}
@@ -211,7 +211,7 @@ nonpart_plot
 #### For Current Member data ####
 ```{r}
 # Load the Excel file: Current.Members.JoinDate.xlsx
-CurrentMember_data <-read_excel("/Users/heiyo/Desktop/MQE/Capstone/Current.Members.JoinDate.xlsx") 
+CurrentMember_data <-read_excel("/Users/XXX/Capstone/Current.Members.JoinDate.xlsx") 
 ```
 
 ```{r}
