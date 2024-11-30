@@ -255,18 +255,6 @@ member_count_plot <- ggplot(member_count_data, aes(x = Category, y = Count)) +
 member_count_plot
 ```
 
-#### Merge data ####
-```{r}
-#merged_data <- merge(CurrentMember_data, cleaned_23att, by = "Company", all.x = TRUE)
-# Current member 835
-# ........
-```
-
-```{r}
-#merged_data$Attendee <- ifelse(is.na(merged_data$Attendee), 0, merged_data$Attendee)
-```
-
-
 #### How is the variable of event participation linked to member renewal? 
 1. event participation (attendee/brite) 
 2. member renewal (monthly member list )
