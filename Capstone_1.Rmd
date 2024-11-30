@@ -80,6 +80,7 @@ att_2023data <- read_excel(att_data, sheet = sheet[6])
 num_unique_rgtype <- length(unique(att_2023data$`Register Type`))
 print(num_unique_rgtype)
 ```
+
 ````{r}
 unique_rgcounts <- table(att_2023data$`Register Type`)
 ```
@@ -111,12 +112,6 @@ cleaned_23att <- att_2023data %>%
 #length(unique(cleaned_21att$`Event Code`))
 #length(unique(cleaned_22att$`Event Code`))
 #length(unique(cleaned_23att$`Event Code`))
-# 75
-# 61
-# 57
-# 39
-# 43
-# 11
 ```
 
 #### For 2023 Attendee data ####
