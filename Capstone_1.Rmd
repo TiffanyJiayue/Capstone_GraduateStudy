@@ -5,6 +5,7 @@ date: "2024-01-28"
 ---
 
 # OBJECTIVE: 
+# EXPLORING SCORECARD and ATTENDEE datasets 
 1. Preparing data about attendance
 2. Trying to get the Non-particpant data from the existed data
 3. Making a plot of number of each category
@@ -22,13 +23,49 @@ library(dplyr)
 library(ggplot2)
 ```
 
-# Some brainstorm
+# Some brainstorm (scorecard datasets)
+# How many different type of scorecards?
+```{r}
+sc_data <- "/Users/heiyo/Documents/Pitt/MQE学习/MQE/Capstone/Scorecards 2018 through 2023.xlsx"
+sheet <- excel_sheets(sc_data)
+sc_2018data <- read_excel(sc_data, sheet = sheet[1])
+sc_2019data <- read_excel(sc_data, sheet = sheet[2])
+sc_2020data <- read_excel(sc_data, sheet = sheet[3])
+sc_2021data <- read_excel(sc_data, sheet = sheet[4])
+sc_2022data <- read_excel(sc_data, sheet = sheet[5])
+sc_2023data <- read_excel(sc_data, sheet = sheet[6])
+sc_alldata <- bind_rows(sc_2018data, sc_2019data, sc_2020data, sc_2021data,
+sc_2022data, sc_2023data)
+```
+
+# Choose sc_2023data to explore dataset deeper
+```{r}
+# Check the number of unique values in the column "SC Type"
+num_unique_sctype <- length(unique(sc_2023data$`SC Type`))
+```
+
+```{r}
+# Print the result
+print(num_unique_sctype)
+```
+
+```{r}
+# Create a frequency table of unique values
+unique_sccounts <- table(sc_2023data$`SC Type`)
+```
+
+```{r}
+# Print the table
+print(unique_sccounts)
+```
+
+# Some brainstorm (event attendees datasets)
 # How is the variable of event participation linked to member renewal? #
 #### For Attendee data ####
 ```{r}
-# please change "XXX" to your laptop name
+# please change "heiyo" to your laptop name
 # Load the Excel file: Event Attendees 2018 through 2023.xlsx
-att_data <- "/Users/XXX/Event Attendees 2018 through 2023.xlsx"
+att_data <- "/Users/heiyo/Documents/Pitt/MQE学习/MQE/Capstone/Event Attendees 2018 through 2023.xlsx"
 sheet <- excel_sheets(att_data)
 att_2018data <- read_excel(att_data, sheet = sheet[1])
 att_2019data <- read_excel(att_data, sheet = sheet[2])
@@ -36,6 +73,20 @@ att_2020data <- read_excel(att_data, sheet = sheet[3])
 att_2021data <- read_excel(att_data, sheet = sheet[4])
 att_2022data <- read_excel(att_data, sheet = sheet[5])
 att_2023data <- read_excel(att_data, sheet = sheet[6])
+```
+
+# How many register type in event attendees datasets?
+```{r}
+num_unique_rgtype <- length(unique(att_2023data$`Register Type`))
+print(num_unique_rgtype)
+```
+````{r}
+unique_rgcounts <- table(att_2023data$`Register Type`)
+```
+
+```{r}
+# Print the table
+print(unique_rgcounts)
 ```
 
 ```{r}
@@ -104,7 +155,7 @@ print(unique_register_types)
 #### For Non-Participant data ####
 ```{r}
 # Load the Excel file: NonParticipant.Members.LastYear.xlsx
-Nonpartipant_data <-read_excel("/Users/XXX/NonParticipant.Members.LastYear.xlsx") 
+Nonpartipant_data <-read_excel("/Users/heiyo/Desktop/MQE/Capstone/NonParticipant.Members.LastYear.xlsx") 
 ```
 
 ```{r}
@@ -157,11 +208,10 @@ nonpart_plot <- ggplot(category_data, aes(x = Category, y = Count.Freq)) +
 nonpart_plot
 ```
 
-
 #### For Current Member data ####
 ```{r}
 # Load the Excel file: Current.Members.JoinDate.xlsx
-CurrentMember_data <-read_excel("/Users/XXX/Current.Members.JoinDate.xlsx") 
+CurrentMember_data <-read_excel("/Users/heiyo/Desktop/MQE/Capstone/Current.Members.JoinDate.xlsx") 
 ```
 
 ```{r}
@@ -237,7 +287,6 @@ Questions (be ready to ask at meeting with PTC):
 Questions:
 - there are some blank in this dataset, meaning?
 - Start from 2021 to current, if only member can post on Career Connector, -> any relation b/w renewing membership?
-
 
 
 
