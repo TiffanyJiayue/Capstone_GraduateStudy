@@ -11,7 +11,7 @@ date: "2024-03-12"
 4. Add company category to mem_data.
 5. Plot how many current members in each category.
 6. Focus on a specific type category company to make some analysis.
-7. Make a plot of "Behavior Comparison between First Six Months and Second Six Months.
+7. Make a plot of "Behavior Comparison between First Six Months and Second Six Months."
 8. Add confidence intervals for each bar.
 9. Plot how much percentage of Member Usage Before Leaving PTC. ("Event_Participation", "Benefit_Usage", "SC.BusinessDevelopment", "SC.Outreach", "SC.Visibility", "SC.Talent", "SC.Advocacy", "SC.Engagement", "SC.Benefits")
 10. Comparison of Event Participation (First Year vs Last Year).
@@ -30,7 +30,7 @@ library(dplyr)
 # ++++++++++++ Cross Event ++++++++++++++++ #
 ```{r}
 # using the cross event data #
-cross_data <- "/Users/heiyo/Desktop/MQE/Capstone/Cross-Event_40_Events_Sales_Summary_Excel_93284519469_20240201_2114.xlsx"
+cross_data <- "/Users/XXX/Cross-Event_40_Events_Sales_Summary_Excel_93284519469_20240201_2114.xlsx"
 cross_data <- read_excel(cross_data)
 ```
 
@@ -78,7 +78,7 @@ cleaned_cross <- cleaned_cross %>%
 # ++++++++++++ CleanedMember.EventParticipation ++++++++++++++++ #
 ```{r}
 # using the CleanedMember.EventParticipation data from James
-Cleaned_eventdate <- read.csv("/Users/heiyo/Desktop/MQE/Capstone/CleanedMember.EventParticipation.csv")
+Cleaned_eventdate <- read.csv("/Users/XXX/CleanedMember.EventParticipation.csv")
 ```
 
 ```{r}
@@ -373,7 +373,7 @@ scorecard_data$Month <- 12 * (year(scorecard_data$SC.Date) - year(start_date)) +
 
 #### after creating binary col for scorecard, I find that our mem_data has mistake,(a lot of replicating rows, for example Company Name'3Cloud', '4th Source'......) #### ( I didn't realize this issue until I trying to figure out what is the meaning of Payment.Amount, and the month value of those companies are repeated twice.  ####
 
-#### for creating binary col, i tried to create cols such as SC.BusinessDevelopment, SC.Outreach...in scorecard data and then merge to mem_data, but a lot of duplicate cols. therefore, I do each type seperatly.
+#### for creating binary col, i tried to create cols such as SC.BusinessDevelopment, SC.Outreach...in scorecard data and then merge to mem_data, but a lot of duplicate cols. Therefore, I do each type separately.
 
 #### For SC.BusinessDevelopment ####
 ```{r}
@@ -381,9 +381,9 @@ BD_scorecard_data <- scorecard_data %>%
   filter(type == "Business Development") %>%
   mutate(SC.BusinessDevelopment = 1)
 # 2256 obs
-###### some repeat value appear
+###### some repeat values appear
 ###### for example 	
-###### 4CTechnologies (Month 45 appear twice, probably because type Business Development has different reasoning)
+###### 4CTechnologies (Month 45 appears twice, probably because type Business Development has different reasoning)
 ###### in order to not let mem_data has duplicate obs, I will aggregate BD_scorecard_data
 ```
 
