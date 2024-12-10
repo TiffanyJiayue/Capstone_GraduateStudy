@@ -100,4 +100,16 @@ This dataset contains information about ticket purchases and buyer details for e
 - **Order Date** and **Event Name** help analyze sales trends.  
 - Buyer-related columns distinguish between the attendee and purchaser.
 
----will update in few days
+## 4.BenefitParticipants Dataset
+
+### Overview
+This dataset provides information about companies participating in benefit-related activities, focusing on their membership status. The dataset contains the following columns:
+
+1. **Company Name**: The name of the company participating in the activity.
+2. **Member Type**: The membership status of the company, categorized as:
+   - **NM**: Not a current member.
+   - **M**: Current member.
+   - **MN**: New member.
+
+### Notes:
+- This dataset is useful for analyzing the distribution of membership types among benefit participants and understanding how these activities may correlate with member retention or engagement.
