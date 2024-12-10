@@ -12,7 +12,7 @@ The Scorecard Dataset contains information about scorecards created for member c
 1. **Company**: Names of the companies associated with the scorecards.  
 2. **SC Date**: The date the scorecard was created.  
 3. **SC Entry Date**: The date the scorecard was recorded in the system.  
-4. **SC Type**: The type of scorecard (e.g., General: Outreach (in person),Visibility: Event Listed on Web Calendar, Business Development: Introduced to Prospective Customer (in person)... ) 
+4. **SC Type**: The type of scorecard (e.g., General: Outreach (in person), Visibility: Event Listed on Web Calendar, Business Development: Introduced to Prospective Customer (in person), Talent: Participated in a Job Fair, Fortyx80: STEM Engagement Corporation, Advocacy: Government Procurement Assistance... ) 
 5. **Value**: A binary column indicating whether the scorecard holds value for analysis (0 or 1).  
 6. **Expected Rate**: A numeric column representing expected rates, ranging from 0 to 10,000.  
 7. **SC Owner**: The name of the person responsible for the scorecard.  
