@@ -1,6 +1,7 @@
 # Dataset Descriptions
 
 This repository contains descriptions of three datasets used in analyzing member engagement, event participation, and trends for the Pittsburgh Technology Council.
+* The datasets used in this project are proprietary and were provided by the Pittsburgh Technology Council. Due to the sensitive nature of the data, the datasets are not included in this repository. However, detailed descriptions of the datasets are provided below to offer insight into their structure and variables, enabling others to replicate similar analyses with their own data.
 
 ## 1. Scorecard Dataset
 
